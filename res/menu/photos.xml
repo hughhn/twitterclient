@@ -5,6 +5,7 @@
         android:orderInCategory="5"
         android:showAsAction="ifRoom"
         android:icon="@drawable/ic_action_compose"
+        android:onClick="showComposeDialog"
         android:title="@string/action_compose"/>
     
     <item

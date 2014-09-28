@@ -11,5 +11,10 @@
     <string name="tweet_body_label">tweet body</string>
     <string name="tweet_username">username</string>
     <string name="timestamp_label">timestamp</string>
+    <string name="remaining_char_label">140</string>
+    <string name="btn_tweet_label">Tweet</string>
+    <string name="foo_label">foo</string>
+    <string name="screenname_compose_label">\@foo</string>
+    <string name="compose_hint">What\'s happening?</string>
 
 </resources>
