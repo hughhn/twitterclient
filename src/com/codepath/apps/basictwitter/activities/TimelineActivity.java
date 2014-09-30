@@ -74,10 +74,10 @@ public class TimelineActivity extends FragmentActivity implements
                 // Your code to refresh the list here.
                 // Make sure you call swipeContainer.setRefreshing(false)
                 // once the network request has completed successfully.
-            	aTweets.clear();
-            	mSinceId = -1;
-            	mMaxId = -1;
-            	customLoadMoreDataFromApi(0);
+            	// aTweets.clear();
+            	// mSinceId = -1;
+            	// mMaxId = -1;
+            	customLoadMoreDataFromApi(mSinceId, -1);
             } 
         });
 
@@ -89,17 +89,16 @@ public class TimelineActivity extends FragmentActivity implements
 				// Add whatever code is needed to append new items to your
 				// AdapterView
 				// customLoadMoreDataFromApi(page);
-				customLoadMoreDataFromApi(totalItemsCount);
-				// populateTimeline(mCount, -1, mMaxId);
+				customLoadMoreDataFromApi(-1, mMaxId);
 			}
 		});
 		
 		// Initialize feed
-		customLoadMoreDataFromApi(0);
+		customLoadMoreDataFromApi(-1, -1);
 	}
 
 	// Append more data into the adapter
-	public void customLoadMoreDataFromApi(int offset) {
+	public void customLoadMoreDataFromApi(long sinceId, long maxId) {
 		// This method probably sends out a network request and appends new data
 		// items to your adapter.
 		// Use the offset value and add it as a parameter to your API request to
@@ -113,29 +112,51 @@ public class TimelineActivity extends FragmentActivity implements
 			return;
 		}
 		
-		final int tempOffset = offset;
+		final long tempSinceId = sinceId;
+		final long tempMaxId = maxId;
 		client.getHomeTimeline(new JsonHttpResponseHandler() {
 			@Override
 			public void onSuccess(JSONArray json) {
-				Log.d("DEBUG", "getHomeTimeline() rsp: " + json.toString());
+				Log.d("DEBUG", "getHomeTimeline() rsp:\n" + json.toString());
 				ArrayList<Tweet> tweets = Tweet.fromJSONArray(json);
-				aTweets.addAll(tweets);
+				
 
 				if (tweets != null && !tweets.isEmpty()) {
-					if (tempOffset == 0) {
-						// first load, update since_id
+					if (tempSinceId == -1 && tempMaxId == -1) {
+						// first load, update tracking IDs
+						aTweets.addAll(tweets);
 						mSinceId = tweets.get(0).getUid();
+						mMaxId = tweets.get(tweets.size() - 1).getUid() - 1;
 					}
-					mMaxId = tweets.get(tweets.size() - 1).getUid() - 1;
+					else if (tempSinceId != -1) {
+						// pull to refresh, update since_id
+						for (int i = tweets.size() - 1; i >= 0; i--) {
+							aTweets.insert(tweets.get(i), 0);
+						}
+						mSinceId = tweets.get(0).getUid();
+					} else if (tempMaxId != -1) {
+						// scroll down, update max_id
+						aTweets.addAll(tweets);
+						mMaxId = tweets.get(tweets.size() - 1).getUid() - 1;
+					}
+					
 				}
 			}
 
 			@Override
 			public void onFailure(Throwable e, String s) {
+				Toast.makeText(TimelineActivity.this, s, Toast.LENGTH_SHORT).show();
 				Log.d("DEBUG", e.toString());
 				Log.d("DEBUG", s.toString());
 			}
-		}, mCount, -1, mMaxId);
+			
+			@Override
+			protected void handleFailureMessage(Throwable e, String s) {
+				Toast.makeText(TimelineActivity.this, s, Toast.LENGTH_SHORT).show();
+				Log.d("DEBUG", e.toString());
+				Log.d("DEBUG", s.toString());
+			}
+		}, mCount, tempSinceId, tempMaxId);
 	}
 
 	@Override

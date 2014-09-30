@@ -89,6 +89,11 @@ public class ComposeDialog extends DialogFragment {
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				charCount -= (count - before);
 				tvCharCount.setText(String.valueOf(charCount));
+				if (charCount < 0) {
+					btnTweet.setEnabled(false);
+				} else if (!btnTweet.isEnabled()) {
+					btnTweet.setEnabled(true);
+				}
 			}
 			
 			@Override
