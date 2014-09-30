@@ -5,14 +5,20 @@ import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.codepath.apps.basictwitter.R;
 import com.codepath.apps.basictwitter.TwitterApp;
@@ -31,25 +37,49 @@ public class TimelineActivity extends FragmentActivity implements
 	private ArrayList<Tweet> tweets;
 	private ArrayAdapter<Tweet> aTweets;
 	private ListView lvTweets;
+	private SwipeRefreshLayout swipeContainer;
 	private ComposeDialog composeDialog;
 	private User meUser = null;
+	private long mSinceId = -1;
+	private long mMaxId = -1;
+	private final int mCount = 20;
+
+	public Boolean isNetworkAvailable() {
+		ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo activeNetworkInfo = connectivityManager
+				.getActiveNetworkInfo();
+		return activeNetworkInfo != null
+				&& activeNetworkInfo.isConnectedOrConnecting();
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_timeline);
-
+		client = TwitterApp.getRestClient();
 		setupViews();
 	}
 
 	private void setupViews() {
+		swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
 		lvTweets = (ListView) findViewById(R.id.lvTweets);
 		tweets = new ArrayList<Tweet>();
 		aTweets = new TweetArrayAdapter(this, tweets);
 		lvTweets.setAdapter(aTweets);
-
-		client = TwitterApp.getRestClient();
-		populateTimeline();
+		
+		// Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Your code to refresh the list here.
+                // Make sure you call swipeContainer.setRefreshing(false)
+                // once the network request has completed successfully.
+            	aTweets.clear();
+            	mSinceId = -1;
+            	mMaxId = -1;
+            	customLoadMoreDataFromApi(0);
+            } 
+        });
 
 		// Attach the listener to the AdapterView onCreate
 		lvTweets.setOnScrollListener(new EndlessScrollListener() {
@@ -60,9 +90,12 @@ public class TimelineActivity extends FragmentActivity implements
 				// AdapterView
 				// customLoadMoreDataFromApi(page);
 				customLoadMoreDataFromApi(totalItemsCount);
+				// populateTimeline(mCount, -1, mMaxId);
 			}
 		});
-
+		
+		// Initialize feed
+		customLoadMoreDataFromApi(0);
 	}
 
 	// Append more data into the adapter
@@ -73,6 +106,36 @@ public class TimelineActivity extends FragmentActivity implements
 		// retrieve paginated data.
 		// Deserialize API response and then construct new objects to append to
 		// the adapter
+		// Check Internet connection
+		if (!isNetworkAvailable()) {
+			Toast.makeText(getApplicationContext(), "network unavailable",
+					Toast.LENGTH_SHORT).show();
+			return;
+		}
+		
+		final int tempOffset = offset;
+		client.getHomeTimeline(new JsonHttpResponseHandler() {
+			@Override
+			public void onSuccess(JSONArray json) {
+				Log.d("DEBUG", "getHomeTimeline() rsp: " + json.toString());
+				ArrayList<Tweet> tweets = Tweet.fromJSONArray(json);
+				aTweets.addAll(tweets);
+
+				if (tweets != null && !tweets.isEmpty()) {
+					if (tempOffset == 0) {
+						// first load, update since_id
+						mSinceId = tweets.get(0).getUid();
+					}
+					mMaxId = tweets.get(tweets.size() - 1).getUid() - 1;
+				}
+			}
+
+			@Override
+			public void onFailure(Throwable e, String s) {
+				Log.d("DEBUG", e.toString());
+				Log.d("DEBUG", s.toString());
+			}
+		}, mCount, -1, mMaxId);
 	}
 
 	@Override
@@ -124,20 +187,5 @@ public class TimelineActivity extends FragmentActivity implements
 			}
 		}, status);
 
-	}
-
-	public void populateTimeline() {
-		client.getHomeTimeline(new JsonHttpResponseHandler() {
-			@Override
-			public void onSuccess(JSONArray json) {
-				aTweets.addAll(Tweet.fromJSONArray(json));
-			}
-
-			@Override
-			public void onFailure(Throwable e, String s) {
-				Log.d("DEBUG", e.toString());
-				Log.d("DEBUG", s.toString());
-			}
-		});
 	}
 }
