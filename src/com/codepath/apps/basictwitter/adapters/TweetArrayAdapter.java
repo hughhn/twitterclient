@@ -14,9 +14,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.codepath.apps.basictwitter.R;
 import com.codepath.apps.basictwitter.models.Tweet;
+import com.codepath.apps.basictwitter.utils.ConnectivityHelper;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 public class TweetArrayAdapter extends ArrayAdapter<Tweet> {
@@ -26,9 +28,11 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet> {
 		TextView tvBody;
 		TextView tvCreatedAt;
 	}
+	private ConnectivityHelper connectivityHelper;
 
-	public TweetArrayAdapter(Context context, List<Tweet> tweets) {
+	public TweetArrayAdapter(Context context, ConnectivityHelper connectivityHelper, List<Tweet> tweets) {
 		super(context, 0, tweets);
+		this.connectivityHelper = connectivityHelper;
 	}
 
 	// getRelativeTimeAgo("Mon Apr 01 21:16:23 +0000 2014");
@@ -76,8 +80,10 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet> {
 
 		viewHolder.ivProfileImg.setImageResource(android.R.color.transparent);
 		ImageLoader imageLoader = ImageLoader.getInstance();
-		imageLoader.displayImage(tweet.getUser().getProfileImageUrl(),
-				viewHolder.ivProfileImg);
+		if (connectivityHelper.isNetworkAvailable()) {
+			imageLoader.displayImage(tweet.getUser().getProfileImageUrl(),
+					viewHolder.ivProfileImg);
+		}
 		viewHolder.tvUsername.setText(Html.fromHtml("<b>"
 				+ tweet.getUser().getName() + "</b> " + "<i>@"
 				+ tweet.getUser().getScreenName() + "</i>"));

@@ -1,15 +1,31 @@
 package com.codepath.apps.basictwitter.models;
 
+import java.util.List;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class User implements Parcelable {
-	private String name;
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Select;
+
+@Table(name = "Users")
+public class User extends Model implements Parcelable {
+	// This is how you avoid duplicates based on a unique ID
+	@Column(name = "uid")
 	private long uid;
+
+	@Column(name = "name")
+	private String name;
+
+	@Column(name = "screen_name")
 	private String screenName;
+
+	@Column(name = "profile_image_url")
 	private String profileImageUrl;
 
 	@Override
@@ -24,7 +40,7 @@ public class User implements Parcelable {
 		dest.writeString(screenName);
 		dest.writeString(profileImageUrl);
 	}
-	
+
 	public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
 		@Override
 		public User createFromParcel(Parcel in) {
@@ -78,5 +94,38 @@ public class User implements Parcelable {
 
 	public String getProfileImageUrl() {
 		return profileImageUrl;
+	}
+
+	// Record Finders
+	public static User byId(long id) {
+		User user = null;
+
+		try {
+			user = new Select().from(User.class).where("id = ?", id)
+					.executeSingle();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return user;
+	}
+
+	// Record Finders
+	public static User byUid(long id) {
+		User user = null;
+
+		try {
+			user = new Select().from(User.class).where("uid = ?", id)
+					.executeSingle();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return user;
+	}
+
+	public static List<User> recentItems() {
+		return new Select().from(User.class).orderBy("uid DESC").limit("300")
+				.execute();
 	}
 }
