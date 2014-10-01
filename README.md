@@ -23,7 +23,7 @@ Advanced:
 * [ ] User can tap a tweet to display a "detailed" view of that tweet
 * [ ] User can select "reply" from detail view to respond to a tweet
 * [ ] Improve the user interface and theme the app to feel "twitter branded"
-* [x] Bonus: User can see embedded image media within the tweet detail view
+* [ ] Bonus: User can see embedded image media within the tweet detail view
 * [x] Bonus: Compose activity is replaced with a modal overlay
 
 Also:
