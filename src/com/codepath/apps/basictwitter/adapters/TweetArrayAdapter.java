@@ -6,18 +6,22 @@ import java.util.List;
 import java.util.Locale;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.Html;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.codepath.apps.basictwitter.R;
+import com.codepath.apps.basictwitter.activities.ProfileActivity;
 import com.codepath.apps.basictwitter.models.Tweet;
+import com.codepath.apps.basictwitter.models.User;
 import com.codepath.apps.basictwitter.utils.ConnectivityHelper;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -28,10 +32,14 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet> {
 		TextView tvBody;
 		TextView tvCreatedAt;
 	}
-	private ConnectivityHelper connectivityHelper;
 
-	public TweetArrayAdapter(Context context, ConnectivityHelper connectivityHelper, List<Tweet> tweets) {
+	private ConnectivityHelper connectivityHelper;
+	private Context context;
+
+	public TweetArrayAdapter(Context context,
+			ConnectivityHelper connectivityHelper, List<Tweet> tweets) {
 		super(context, 0, tweets);
+		this.context = context;
 		this.connectivityHelper = connectivityHelper;
 	}
 
@@ -90,6 +98,19 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet> {
 		viewHolder.tvBody.setText(tweet.getBody());
 		viewHolder.tvCreatedAt.setText(Html.fromHtml("<i>"
 				+ getRelativeTimeAgo(tweet.getCreatedAt()) + "</i>"));
+
+		viewHolder.ivProfileImg.setTag(tweet.getUser());
+		viewHolder.ivProfileImg.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Intent i = new Intent(context, ProfileActivity.class);
+				User u = (User) v.getTag();
+				i.putExtra("user", u);
+				context.startActivity(i);
+			}
+		});
+
 		return convertView;
 	}
 }

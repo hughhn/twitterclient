@@ -96,7 +96,7 @@ public class TwitterClient extends OAuthBaseClient {
 	}
 	
 	public void getUserTimeline(AsyncHttpResponseHandler handler,
-			int count, long sinceId, long maxId) {
+			int count, long sinceId, long maxId, long uId) {
 		String apiUrl = getApiUrl("statuses/user_timeline.json");
 		RequestParams params = new RequestParams();
 //		params.put("user_id", String.valueOf(userId));
@@ -106,6 +106,10 @@ public class TwitterClient extends OAuthBaseClient {
 			params.put("since_id", String.valueOf(sinceId));
 		} else if (maxId != -1) {
 			params.put("max_id", String.valueOf(maxId));
+		}
+		
+		if (uId != -1) {
+			params.put("user_id", String.valueOf(uId));
 		}
 
 		Log.d("DEBUG",

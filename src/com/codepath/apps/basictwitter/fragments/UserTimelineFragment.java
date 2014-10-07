@@ -4,17 +4,22 @@ import java.util.ArrayList;
 
 import org.json.JSONArray;
 
-import com.codepath.apps.basictwitter.models.Tweet;
-import com.loopj.android.http.JsonHttpResponseHandler;
-
 import android.app.Activity;
 import android.content.SharedPreferences;
-import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.codepath.apps.basictwitter.models.Tweet;
+import com.codepath.apps.basictwitter.models.User;
+import com.loopj.android.http.JsonHttpResponseHandler;
+
 public class UserTimelineFragment extends TweetsListFragment {
-	
+	private User user;
+
+	public UserTimelineFragment(User user) {
+		this.user = user;
+	}
+
 	public void onAttach(Activity activity) {
 		// TODO Auto-generated method stub
 		super.sinceIdKey = "user_since_id";
@@ -25,6 +30,7 @@ public class UserTimelineFragment extends TweetsListFragment {
 	public void populateFeed(long sinceId, long maxId) {
 		final long tempSinceId = sinceId;
 		final long tempMaxId = maxId;
+		
 		client.getUserTimeline(new JsonHttpResponseHandler() {
 			@Override
 			public void onSuccess(JSONArray json) {
@@ -37,7 +43,8 @@ public class UserTimelineFragment extends TweetsListFragment {
 						// first load, update tracking IDs
 						aTweets.addAll(tweets);
 						editor.putLong(sinceIdKey, tweets.get(0).getUid());
-						editor.putLong(maxIdKey, tweets.get(tweets.size() - 1).getUid() - 1);
+						editor.putLong(maxIdKey, tweets.get(tweets.size() - 1)
+								.getUid() - 1);
 						editor.commit();
 					} else if (tempSinceId != -1) {
 						// pull to refresh, update since_id
@@ -49,11 +56,13 @@ public class UserTimelineFragment extends TweetsListFragment {
 					} else if (tempMaxId != -1) {
 						// scroll down, update max_id
 						aTweets.addAll(tweets);
-						editor.putLong(maxIdKey, tweets.get(tweets.size() - 1).getUid() - 1);
+						editor.putLong(maxIdKey, tweets.get(tweets.size() - 1)
+								.getUid() - 1);
 						editor.commit();
 					}
 
-					// Use AsyncTask to cache the tweets to local ActiveAndroid
+					// Use AsyncTask to cache the tweets to local
+					// ActiveAndroid
 					// database
 					// Caching method also takes care of deduping the users'
 					// IDs.
@@ -74,6 +83,6 @@ public class UserTimelineFragment extends TweetsListFragment {
 				Log.d("DEBUG", e.toString());
 				Log.d("DEBUG", s.toString());
 			}
-		}, mCount, tempSinceId, tempMaxId);
+		}, mCount, tempSinceId, tempMaxId, user.getUid());
 	}
 }

@@ -1,25 +1,24 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:myapp="http://schemas.android.com/apk/res-auto" >
 
     <item
         android:id="@+id/action_compose"
         android:orderInCategory="5"
-        android:showAsAction="always"
+        myapp:showAsAction="always"
         android:icon="@drawable/ic_action_compose"
-        android:onClick="showComposeDialog"
         android:title="@string/action_compose"/>
     
     <item
         android:id="@+id/action_profile"
         android:orderInCategory="6"
-        android:showAsAction="always"
+        myapp:showAsAction="always"
         android:icon="@drawable/ic_action_profile"
-        android:onClick="onProfileView"
         android:title="@string/action_profile"/>
     
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
-        android:showAsAction="never"
+        myapp:showAsAction="never"
         android:icon="@drawable/ic_action_settings"
         android:title="@string/action_settings"/>
 

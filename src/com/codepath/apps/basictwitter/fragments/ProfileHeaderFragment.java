@@ -28,10 +28,13 @@ public class ProfileHeaderFragment extends Fragment {
 	TextView tvFollowing;
 	ImageView ivProfileImage;
 
+	public ProfileHeaderFragment(User user) {
+		this.user = user;
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		loadProfileInfo();
 	}
 
 	@Override
@@ -45,29 +48,14 @@ public class ProfileHeaderFragment extends Fragment {
 		tvFollowers = (TextView) v.findViewById(R.id.tvFollowers);
 		tvFollowing = (TextView) v.findViewById(R.id.tvFollowing);
 		ivProfileImage = (ImageView) v.findViewById(R.id.ivProfileImage);
+		populateProfileInfo(user);
 		return v;
 	}
 
-	public void loadProfileInfo() {
-		TwitterApp.getRestClient().getVerifyCredentials(
-				new JsonHttpResponseHandler() {
-					@Override
-					public void onSuccess(JSONObject json) {
-						user = User.fromJSON(json);
-						getActivity().getActionBar().setTitle(
-								"@" + user.getScreenName());
-						populateProfileInfo(user);
-					}
-
-					@Override
-					public void onFailure(Throwable e, String s) {
-						Log.d("DEBUG", e.toString());
-						Log.d("DEBUG", s.toString());
-					}
-				});
-	}
-
 	private void populateProfileInfo(User u) {
+		if (u == null) return;
+		
+		getActivity().getActionBar().setTitle("@" + u.getScreenName());
 		if (ivProfileImage != null) {
 			tvName.setText(u.getName());
 			tvTagline.setText(u.getTagline());

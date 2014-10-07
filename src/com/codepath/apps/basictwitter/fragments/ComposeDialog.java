@@ -38,7 +38,6 @@ public class ComposeDialog extends DialogFragment {
 	TextView tvScreennameCompose;
 	EditText etTweet;
 	Button btnTweet;
-	private User meUser = null;
 	private TwitterClient client;
 	private static ComposeDialog dialog = null;
 
@@ -46,11 +45,12 @@ public class ComposeDialog extends DialogFragment {
 		// Empty constructor required for DialogFragment
 	}
 
-	public static ComposeDialog getInstance() {
+	public static ComposeDialog getInstance(User user) {
 		if (dialog == null) {
 			dialog = new ComposeDialog();
 		}
 		Bundle args = new Bundle();
+		args.putParcelable("user", user);
 		dialog.setArguments(args);
 		return dialog;
 	}
@@ -60,22 +60,6 @@ public class ComposeDialog extends DialogFragment {
 		Dialog dialog = super.onCreateDialog(savedInstanceState);
 		client = TwitterApp.getRestClient();
 
-		if (meUser == null) {
-			client.getVerifyCredentials(new JsonHttpResponseHandler() {
-				@Override
-				public void onSuccess(JSONObject json) {
-					meUser = User.fromJSON(json);
-					meUser.save();
-				}
-
-				@Override
-				public void onFailure(Throwable e, String s) {
-					Log.d("DEBUG", e.toString());
-					Log.d("DEBUG", s.toString());
-				}
-			});
-		}
-
 		// request a window without the title
 		dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		return dialog;
@@ -84,6 +68,8 @@ public class ComposeDialog extends DialogFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.compose_fragment, container);
+		
+		User user = getArguments().getParcelable("user");
 
 		ivDelete = (ImageView) view.findViewById(R.id.ivDelete);
 		tvCharCount = (TextView) view.findViewById(R.id.tvCharCount);
@@ -99,13 +85,13 @@ public class ComposeDialog extends DialogFragment {
 		tvCharCount.setText(String.valueOf(charCount));
 		ivProfileImgCompose.setImageResource(android.R.color.transparent);
 		ImageLoader imageLoader = ImageLoader.getInstance();
-		if (meUser != null) {
-			imageLoader.displayImage(meUser.getProfileImageUrl(),
+		if (user != null) {
+			imageLoader.displayImage(user.getProfileImageUrl(),
 					ivProfileImgCompose);
-			tvUsernameCompose.setText(Html.fromHtml("<b>" + meUser.getName()
+			tvUsernameCompose.setText(Html.fromHtml("<b>" + user.getName()
 					+ "</b>"));
 			tvScreennameCompose.setText(Html.fromHtml("<i>@"
-					+ meUser.getScreenName() + "</i>"));
+					+ user.getScreenName() + "</i>"));
 		}
 
 		ivDelete.setOnClickListener(new OnClickListener() {
