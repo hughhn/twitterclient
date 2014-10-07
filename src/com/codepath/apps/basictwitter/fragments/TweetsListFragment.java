@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.json.JSONArray;
 
+import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -66,6 +67,10 @@ public class TweetsListFragment extends Fragment {
 	}
 
 	private void setupViews(View v) {
+		if (aTweets != null) {
+			return;
+		}
+		
 		swipeContainer = (SwipeRefreshLayout) v
 				.findViewById(R.id.swipeContainer);
 		lvTweets = (ListView) v.findViewById(R.id.lvTweets);

@@ -3,6 +3,8 @@ package com.codepath.apps.basictwitter.activities;
 import org.json.JSONObject;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
@@ -48,6 +50,7 @@ public class TimelineActivity extends ActionBarActivity implements
 				public void onSuccess(JSONObject json) {
 					user = User.fromJSON(json);
 					user.save();
+					getActionBar().setTitle(user.getName() + "\'s tweets");
 				}
 
 				@Override
@@ -63,6 +66,8 @@ public class TimelineActivity extends ActionBarActivity implements
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		actionBar.setDisplayShowTitleEnabled(true);
+		ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#FFFFFF"));
+		actionBar.setStackedBackgroundDrawable(colorDrawable);
 
 		Tab tab1 = actionBar
 				.newTab()
