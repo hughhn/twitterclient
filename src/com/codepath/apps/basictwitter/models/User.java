@@ -27,6 +27,15 @@ public class User extends Model implements Parcelable {
 
 	@Column(name = "profile_image_url")
 	private String profileImageUrl;
+	
+	@Column(name = "tagline")
+	private String tagline;
+	
+	@Column(name = "followers_count")
+	private int followersCount;
+	
+	@Column(name = "following_count")
+	private int followingCount;
 
 	@Override
 	public int describeContents() {
@@ -39,6 +48,9 @@ public class User extends Model implements Parcelable {
 		dest.writeLong(uid);
 		dest.writeString(screenName);
 		dest.writeString(profileImageUrl);
+		dest.writeInt(followersCount);
+		dest.writeInt(followingCount);
+		dest.writeString(tagline);
 	}
 
 	public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
@@ -58,6 +70,9 @@ public class User extends Model implements Parcelable {
 		this.uid = in.readLong();
 		this.screenName = in.readString();
 		this.profileImageUrl = in.readString();
+		this.followersCount = in.readInt();
+		this.followingCount = in.readInt();
+		this.tagline = in.readString();
 	}
 
 	public User() {
@@ -72,6 +87,9 @@ public class User extends Model implements Parcelable {
 			user.uid = jsonObject.getLong("id");
 			user.screenName = jsonObject.getString("screen_name");
 			user.profileImageUrl = jsonObject.getString("profile_image_url");
+			user.followersCount = jsonObject.getInt("followers_count");
+			user.followingCount = jsonObject.getInt("friends_count");
+			user.tagline = jsonObject.getString("description");
 		} catch (JSONException e) {
 			e.printStackTrace();
 			// return null;
@@ -94,6 +112,18 @@ public class User extends Model implements Parcelable {
 
 	public String getProfileImageUrl() {
 		return profileImageUrl;
+	}
+
+	public String getTagline() {
+		return tagline;
+	}
+
+	public int getFollowersCount() {
+		return followersCount;
+	}
+
+	public int getFollowingCount() {
+		return followingCount;
 	}
 
 	// Record Finders

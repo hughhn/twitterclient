@@ -16,5 +16,7 @@
     <string name="foo_label">foo</string>
     <string name="screenname_compose_label">\@foo</string>
     <string name="compose_hint">What\'s happening?</string>
+    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="action_profile">Profile</string>
 
 </resources>

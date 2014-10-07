@@ -5,14 +5,22 @@
     tools:context="${relativePackage}.${activityClass}" >
 
     <FrameLayout
-        android:id="@+id/flContainer"
+        android:id="@+id/flProfileHeaderContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true" >
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/flProfileContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true" >
-
+        android:layout_below="@+id/flProfileHeaderContainer" >
     </FrameLayout>
 
 </RelativeLayout>

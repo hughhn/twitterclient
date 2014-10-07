@@ -4,8 +4,8 @@ import org.scribe.builder.api.Api;
 import org.scribe.builder.api.TwitterApi;
 
 import android.content.Context;
+import android.util.Log;
 
-import com.codepath.apps.basictwitter.models.Tweet;
 import com.codepath.oauth.OAuthBaseClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -69,6 +69,49 @@ public class TwitterClient extends OAuthBaseClient {
 			params.put("max_id", String.valueOf(maxId));
 		}
 
+		Log.d("DEBUG",
+				"count = " + String.valueOf(count) + " since_id = "
+						+ String.valueOf(sinceId) + " max_id = "
+						+ String.valueOf(maxId));
+		client.get(apiUrl, params, handler);
+	}
+
+	public void getMentionsTimeline(AsyncHttpResponseHandler handler,
+			int count, long sinceId, long maxId) {
+		String apiUrl = getApiUrl("statuses/mentions_timeline.json");
+		RequestParams params = new RequestParams();
+		params.put("count", String.valueOf(count));
+
+		if (sinceId != -1) {
+			params.put("since_id", String.valueOf(sinceId));
+		} else if (maxId != -1) {
+			params.put("max_id", String.valueOf(maxId));
+		}
+
+		Log.d("DEBUG",
+				"count = " + String.valueOf(count) + " since_id = "
+						+ String.valueOf(sinceId) + " max_id = "
+						+ String.valueOf(maxId));
+		client.get(apiUrl, params, handler);
+	}
+	
+	public void getUserTimeline(AsyncHttpResponseHandler handler,
+			int count, long sinceId, long maxId) {
+		String apiUrl = getApiUrl("statuses/user_timeline.json");
+		RequestParams params = new RequestParams();
+//		params.put("user_id", String.valueOf(userId));
+		params.put("count", String.valueOf(count));
+
+		if (sinceId != -1) {
+			params.put("since_id", String.valueOf(sinceId));
+		} else if (maxId != -1) {
+			params.put("max_id", String.valueOf(maxId));
+		}
+
+		Log.d("DEBUG",
+				"count = " + String.valueOf(count) + " since_id = "
+						+ String.valueOf(sinceId) + " max_id = "
+						+ String.valueOf(maxId));
 		client.get(apiUrl, params, handler);
 	}
 
