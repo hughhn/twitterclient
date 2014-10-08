@@ -67,10 +67,6 @@ public class TweetsListFragment extends Fragment {
 	}
 
 	private void setupViews(View v) {
-		if (aTweets != null) {
-			return;
-		}
-		
 		swipeContainer = (SwipeRefreshLayout) v
 				.findViewById(R.id.swipeContainer);
 		lvTweets = (ListView) v.findViewById(R.id.lvTweets);
@@ -101,7 +97,9 @@ public class TweetsListFragment extends Fragment {
 		});
 
 		// Initialize feed
-		customLoadMoreDataFromApi(-1, -1);
+		if (aTweets.isEmpty()) {
+			customLoadMoreDataFromApi(-1, -1);
+		}
 	}
 
 	// Append more data into the adapter
@@ -114,16 +112,14 @@ public class TweetsListFragment extends Fragment {
 		// the adapter
 
 		// Initial load tweets from cache, if there is any
-		/*if (sinceId == -1 && maxId == -1) {
-			ArrayList<Tweet> tweets = (ArrayList<Tweet>) Tweet.recentItems(200);
-			if (tweets != null && !tweets.isEmpty()) {
-				aTweets.addAll(tweets);
-				sinceId = tweets.get(0).getUid();
-				SharedPreferences.Editor editor = mSettings.edit();
-				editor.putLong(sinceIdKey, sinceId);
-				editor.commit();
-			}
-		}*/
+		/*
+		 * if (sinceId == -1 && maxId == -1) { ArrayList<Tweet> tweets =
+		 * (ArrayList<Tweet>) Tweet.recentItems(200); if (tweets != null &&
+		 * !tweets.isEmpty()) { aTweets.addAll(tweets); sinceId =
+		 * tweets.get(0).getUid(); SharedPreferences.Editor editor =
+		 * mSettings.edit(); editor.putLong(sinceIdKey, sinceId);
+		 * editor.commit(); } }
+		 */
 
 		// Check Internet connection
 		if (!connectivityHelper.isNetworkAvailable()) {
